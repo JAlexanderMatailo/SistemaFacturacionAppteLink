@@ -29,6 +29,13 @@ namespace SistemaFacturacionAppteLink.Controllers
             var result = _factura.GetFacturas();
             return new JsonResult(result);
         }
+        [HttpGet("GenerarNumeroFactura")]
+        public IActionResult GenerarNumeroFactura()
+        {
+            var result = _factura.GenerarNumeroFactura();
+            return new JsonResult(result);
+        }
+
         [HttpPost("DeleteFactura")]
         public IActionResult DeleteFactura(Eliminacion factura)
         {

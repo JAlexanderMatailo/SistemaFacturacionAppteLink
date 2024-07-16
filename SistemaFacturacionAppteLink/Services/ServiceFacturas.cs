@@ -18,15 +18,35 @@ namespace SistemaFacturacionAppteLink.Services
         }
         public string GenerarNumeroFactura()
         {
-            var configuracion = _context.Configuracions.First();
-            configuracion.UltimoNumeroFactura += 1;
+            var ultimaFactura = _context.Facturas
+                .OrderByDescending(x => x.FechaCreacion)
+                .FirstOrDefault();
+
+            var configuracion = _context.Configuracions.FirstOrDefault();
+
+            if (configuracion == null)
+            {
+                configuracion = new Configuracion
+                {
+                    UltimoNumeroFactura = ultimaFactura != null ? int.Parse(ultimaFactura.NumeroFactura) : 0
+                };
+                _context.Configuracions.Add(configuracion);
+            }
+
+            int ultimoNumeroFactura = ultimaFactura != null ? int.Parse(ultimaFactura.NumeroFactura) : configuracion.UltimoNumeroFactura;
+
+            ultimoNumeroFactura += 1;
+
+            configuracion.UltimoNumeroFactura = ultimoNumeroFactura;
+
             _context.SaveChanges();
-            return configuracion.UltimoNumeroFactura.ToString();
+
+            return ultimoNumeroFactura.ToString();
         }
 
         public FacturaResponse CrearFactura(FacturaVMRequest factura)
         {
-            factura.NumeroFactura = GenerarNumeroFactura();
+            //factura.NumeroFactura = GenerarNumeroFactura();
             var facturaExiste = _context.Facturas.Any(x => x.NumeroFactura == factura.NumeroFactura);
 
             try
@@ -47,7 +67,7 @@ namespace SistemaFacturacionAppteLink.Services
                             };
 
                             _context.Facturas.Add(nuevaFactura);
-                            _context.SaveChangesAsync();
+                            _context.SaveChanges();
 
                             // Obtener el Id de la factura recién guardada
                             int idFacturaGuardada = nuevaFactura.IdFactura;
@@ -63,7 +83,7 @@ namespace SistemaFacturacionAppteLink.Services
                             };
 
                             _context.ItemsFacturas.Add(ifactura);
-                            _context.SaveChangesAsync();
+                            _context.SaveChanges();
                             context.Commit();
 
                             mensajeria.codigoResult = (int)Codigos.CodigoSuccess;

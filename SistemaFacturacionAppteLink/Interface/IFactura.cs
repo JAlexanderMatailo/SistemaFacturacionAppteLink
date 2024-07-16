@@ -7,5 +7,6 @@ namespace SistemaFacturacionAppteLink.Interface
         FacturaResponse CrearFactura(FacturaVMRequest factura);
         ResultFactura GetFacturas();
         EliminacionFactura DeleteFactura(Eliminacion factura);
+        string GenerarNumeroFactura();
     }
 }

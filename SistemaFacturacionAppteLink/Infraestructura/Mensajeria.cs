@@ -8,7 +8,7 @@
         public const string MensajeSuccesCedula = "Registro con cedula exitoso";
         public const string MensajeExisteCedula = "Ya existe un cliente registrado con este DNI";
         public const string MensajeUpdateE = "No se pudo actualizar los datos";
-        public const string MensajeDeleteE = "No se pudo eliminar al cliente, debido a que no existe";
+        public const string MensajeDeleteE = "No se pudo eliminar, debido a que no existe";
         public const string MensajeDeleteF = "No se pudo eliminar la factura, debido a que no existe";
         public const string MensajeExisteUsuario = "Ya existe un usuario con este nombre, ingrese otro";
         public const string MensajeExisteUsuarioCorreo = "El correo ingresado está asociado a otro usuario";
