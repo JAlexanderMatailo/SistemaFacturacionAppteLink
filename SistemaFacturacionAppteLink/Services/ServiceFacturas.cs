@@ -40,11 +40,10 @@ namespace SistemaFacturacionAppteLink.Services
             configuracion.UltimoNumeroFactura = ultimoNumeroFactura;
 
             _context.SaveChanges();
-
-            return ultimoNumeroFactura.ToString();
+            return ultimoNumeroFactura.ToString("D5");
         }
 
-        public FacturaResponse CrearFactura(FacturaVMRequest factura)
+        /*public FacturaResponse CrearFactura(FacturaVMRequest factura)
         {
             //factura.NumeroFactura = GenerarNumeroFactura();
             var facturaExiste = _context.Facturas.Any(x => x.NumeroFactura == factura.NumeroFactura);
@@ -115,7 +114,85 @@ namespace SistemaFacturacionAppteLink.Services
                 Mensajeria = mensajeria
             };
         }
+        */
+        public FacturaResponse CrearFactura(FacturaVMRequest factura)
+        {
+            FacturaResponse response = new FacturaResponse();
 
+            try
+            {
+                // Verificar si el número de factura ya existe
+                bool facturaExiste = _context.Facturas.Any(x => x.NumeroFactura == factura.NumeroFactura);
+
+                if (!facturaExiste)
+                {
+                    using (var context = _context.Database.BeginTransaction())
+                    {
+                        try
+                        {
+                            
+                            Factura nuevaFactura = new Factura()
+                            {
+                                NumeroFactura = factura.NumeroFactura,
+                                IdCliente = factura.IdCliente,
+                                Subtotal = factura.Subtotal,
+                                Igv = factura.Igv,
+                                Total = factura.Total
+                            };
+
+                            _context.Facturas.Add(nuevaFactura);
+                            _context.SaveChanges();
+
+                            
+                            int idFacturaGuardada = nuevaFactura.IdFactura;
+
+                            
+                            foreach (var producto in factura.Productos)
+                            {
+                                ItemsFactura ifactura = new ItemsFactura()
+                                {
+                                    IdFactura = idFacturaGuardada,
+                                    CodigoProducto = producto.CodigoProducto,
+                                    NombreProducto = producto.NombreProducto,
+                                    Precio = producto.Precio,
+                                    Cantidad = producto.Cantidad,
+                                    SubtotalF = producto.SubtotalF
+                                };
+
+                                _context.ItemsFacturas.Add(ifactura);
+                            }
+
+                            _context.SaveChanges();
+                            context.Commit();
+
+                            mensajeria.codigoResult = (int)Codigos.CodigoSuccess;
+                            mensajeria.mensajeDescripcion = "Factura creada exitosamente.";
+                            response.Factura = factura;
+                            response.Mensajeria = mensajeria;
+                        }
+                        catch (Exception ex)
+                        {
+                            mensajeria.codigoResult = (int)Codigos.CodigoError;
+                            mensajeria.mensajeDescripcion = MensajeExcepciones.MensajeError + ex.Message;
+                            context.Rollback();
+                        }
+                    }
+                }
+                else
+                {
+                    mensajeria.codigoResult = (int)Codigos.CodigoError;
+                    mensajeria.mensajeDescripcion = "El número de factura ya existe.";
+                }
+            }
+            catch (Exception ex)
+            {
+                mensajeria.codigoResult = (int)Codigos.CodigoErrorServer;
+                mensajeria.mensajeDescripcion = MensajeExcepciones.MensajeNoConexion + ex.Message;
+            }
+
+            response.Mensajeria = mensajeria;
+            return response;
+        }
 
         public ResultFactura GetFacturas()
         {

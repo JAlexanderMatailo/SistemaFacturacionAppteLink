@@ -1,28 +1,55 @@
 ﻿namespace SistemaFacturacionAppteLink.ViewModels
 {
+    //public class FacturaVMRequest
+    //{
+    //    public int IdFactura { get; set; }
+    //    public string NumeroFactura { get; set; } = null!;
+
+    //    public int IdCliente { get; set; }
+
+    //    public decimal Subtotal { get; set; }
+
+    //    public decimal Igv { get; set; }
+
+    //    public decimal Total { get; set; }
+
+    //    public string CodigoProducto { get; set; } = null!;
+
+    //    public string NombreProducto { get; set; } = null!;
+
+    //    public decimal Precio { get; set; }
+
+    //    public int Cantidad { get; set; }
+
+    //    public decimal SubtotalF { get; set; }
+
+    //}
+
+    //public class FacturaResponse
+    //{
+    //    public FacturaVMRequest Factura { get; set; }
+    //    public MensajesVM Mensajeria { get; set; }
+    //}
     public class FacturaVMRequest
     {
         public int IdFactura { get; set; }
         public string NumeroFactura { get; set; } = null!;
-
         public int IdCliente { get; set; }
-
         public decimal Subtotal { get; set; }
-
         public decimal Igv { get; set; }
-
         public decimal Total { get; set; }
 
+        
+        public List<ProductoFacturaVM> Productos { get; set; } = new List<ProductoFacturaVM>();
+    }
+
+    public class ProductoFacturaVM
+    {
         public string CodigoProducto { get; set; } = null!;
-
         public string NombreProducto { get; set; } = null!;
-
         public decimal Precio { get; set; }
-
         public int Cantidad { get; set; }
-
         public decimal SubtotalF { get; set; }
-
     }
 
     public class FacturaResponse
@@ -30,6 +57,7 @@
         public FacturaVMRequest Factura { get; set; }
         public MensajesVM Mensajeria { get; set; }
     }
+
     public class FacturaVMResponse
     {
         public int IdFactura { get; set; }
