@@ -120,7 +120,7 @@ namespace SistemaFacturacionAppteLink.Services
                 }
                 else
                 {
-                    var intentos = IntentosFallidos(nombreUsuario);
+                    var intentos = IntentosFallidos(nombreUsuario, password);
                     result.codigoResult = intentos.codigoResult;
                     result.mensajeDescripcion = intentos.mensajeDescripcion;
                     //result.codigoResult = (int)Codigos.CodigoFail;
@@ -187,10 +187,10 @@ namespace SistemaFacturacionAppteLink.Services
 
                     return new JsonResult(mensajeria);
                 }*/
-        public (int codigoResult, string mensajeDescripcion) IntentosFallidos(string nombreUsuario)
+        public (int codigoResult, string mensajeDescripcion) IntentosFallidos(string nombreUsuario, string password)
         {
             var usuario = _context.Usuarios.Any(x => x.Usuario1 == nombreUsuario && x.Bloqueado == false);
-            var contraseña = _context.Usuarios.Any(x => x.Contrasena == nombreUsuario);
+            var contraseña = _context.Usuarios.Any(x => x.Contrasena == password);
 
             try
             {
@@ -208,7 +208,7 @@ namespace SistemaFacturacionAppteLink.Services
                                 _context.SaveChanges();
                                 context.Commit();
 
-                                mensajeria.codigoResult = (int)Codigos.CodigoSuccess;
+                                mensajeria.codigoResult = (int)Codigos.CodigoFail;
                                 mensajeria.mensajeDescripcion = MensajeExcepciones.MensajeIPassword;
                             }
                             catch (Exception ex)
@@ -220,7 +220,7 @@ namespace SistemaFacturacionAppteLink.Services
                     }
                     else
                     {
-                        mensajeria.codigoResult = (int)Codigos.CodigoSuccess;
+                        mensajeria.codigoResult = (int)Codigos.CodigoFail;
                         mensajeria.mensajeDescripcion = MensajeExcepciones.MensajeBUser;
                     }
                 }

@@ -16,7 +16,7 @@
         public const string MensajeExisteProducto= "Los sentimos,revise los datos ingresados ya que puede existir un producto con el mismo nombre y diferente codigo o con el mismo codigo y diferente nombre.";
         public const string MensajeIPassword= "Contraseña incorrecta";
         public const string MensajeIUser= "Usuario incorrecto";
-        public const string MensajeBUser= "Usuario bloqueado";
+        public const string MensajeBUser= "Usuario bloqueado, máximo de 3 intentos permitidos excedido";
 
     }
     public static class MensajeExito

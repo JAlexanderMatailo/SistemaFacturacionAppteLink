@@ -193,12 +193,12 @@ namespace SistemaFacturacionAppteLink.Services
             response.Mensajeria = mensajeria;
             return response;
         }
-
+        /*
         public ResultFactura GetFacturas()
         {
             ResultFactura result = new ResultFactura()
             {
-                FacturaList = new List<FacturaVMResponse>()
+                FacturaList = new List<FacturResponseVM>()
             };
 
             try
@@ -240,7 +240,7 @@ namespace SistemaFacturacionAppteLink.Services
                         {
                             foreach (var fact in facturas)
                             {
-                                FacturaVMResponse factura = new FacturaVMResponse()
+                                FacturResponseVM factura = new FacturResponseVM()
                                 {
                                     IdFactura = fact.IdFactura,
                                     NumeroFactura = fact.NumeroFactura,
@@ -290,7 +290,116 @@ namespace SistemaFacturacionAppteLink.Services
 
             return result;
         }
+        */
+        public ResultFactura GetFacturas()
+        {
+            ResultFactura result = new ResultFactura()
+            {
+                FacturaList = new List<FacturResponseVM>()
+            };
 
+            try
+            {
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var facturas = (
+                            from itF in _context.ItemsFacturas
+                            join fact in _context.Facturas on itF.IdFactura equals fact.IdFactura
+                            join cli in _context.Clientes on fact.IdCliente equals cli.IdCliente
+                            where fact.Activo == true
+                            select new
+                            {
+                                itF.IdItem,
+                                itF.CodigoProducto,
+                                itF.NombreProducto,
+                                itF.Precio,
+                                itF.Cantidad,
+                                itF.SubtotalF,
+                                fact.IdFactura,
+                                fact.NumeroFactura,
+                                fact.Subtotal,
+                                fact.PorcentajeIgv,
+                                fact.Igv,
+                                fact.Total,
+                                fact.FechaCreacion,
+                                fact.Activo,
+                                cli.IdCliente,
+                                cli.RucDni,
+                                cli.Nombre,
+                                cli.Direccion,
+                                cli.Correo
+                            }
+                        ).ToList();
+
+                        if (facturas != null && facturas.Any())
+                        {
+                            var groupedFacturas = facturas.GroupBy(f => f.IdFactura);
+
+                            foreach (var group in groupedFacturas)
+                            {
+                                var facturaData = group.First();
+                                FacturResponseVM factura = new FacturResponseVM()
+                                {
+                                    IdFactura = facturaData.IdFactura,
+                                    NumeroFactura = facturaData.NumeroFactura,
+                                    IdCliente = facturaData.IdCliente,
+                                    Subtotal = facturaData.Subtotal,
+                                    PorcentajeIgv = facturaData.PorcentajeIgv,
+                                    Igv = facturaData.Igv,
+                                    Total = facturaData.Total,
+                                    FechaCreacion = (DateTime)facturaData.FechaCreacion,
+                                    Activo = facturaData.Activo,
+                                    Cliente = new ClienteResponseVM()
+                                    {
+                                        IdCliente = facturaData.IdCliente,
+                                        RucDni = facturaData.RucDni,
+                                        Nombre = facturaData.Nombre,
+                                        Direccion = facturaData.Direccion,
+                                        Correo = facturaData.Correo
+                                    },
+                                    Items = group.Select(it => new ItemsRespnseVM()
+                                    {
+                                        IdItem = it.IdItem,
+                                        IdFactura = it.IdFactura,
+                                        CodigoProducto = it.CodigoProducto,
+                                        NombreProducto = it.NombreProducto,
+                                        Precio = it.Precio,
+                                        Cantidad = it.Cantidad,
+                                        SubtotalF = it.SubtotalF
+                                    }).ToList()
+                                };
+                                result.FacturaList.Add(factura);
+                            }
+
+                            result.codigoResult = (int)Codigos.CodigoSuccess;
+                            result.mensajeDescripcion = MensajeExito.MensajeSucces;
+                        }
+                        else
+                        {
+                            result.codigoResult = (int)Codigos.CodigoFail;
+                            result.mensajeDescripcion = MensajeExcepciones.MensajeExisteRegistro;
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        result.codigoResult = (int)Codigos.CodigoError;
+                        result.mensajeDescripcion = "Error de consulta: " + ex.Message;
+                        transaction.Rollback();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.codigoResult = (int)Codigos.CodigoError;
+                result.mensajeDescripcion = MensajeExcepciones.MensajeNoConexion + ex.Message;
+            }
+
+            return result;
+        }
         public EliminacionFactura DeleteFactura(Eliminacion factura)
         {
             EliminacionFactura elFactura = new EliminacionFactura();
