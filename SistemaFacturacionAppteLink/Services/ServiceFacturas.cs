@@ -415,8 +415,8 @@ namespace SistemaFacturacionAppteLink.Services
 
                         _context.SaveChanges();
                         transaction.Commit();
-                        elFactura.eliminar.IdFactura = facturaExiste.IdFactura;
-                        elFactura.eliminar.NumeroFactura = facturaExiste.NumeroFactura;
+                        //elFactura.eliminar.IdFactura = facturaExiste.IdFactura;
+                        //elFactura.eliminar.NumeroFactura = facturaExiste.NumeroFactura;
                         elFactura.codigoResult = mensajeria.codigoResult = (int)Codigos.CodigoSuccess;
                         elFactura.mensajeDescripcion = mensajeria.mensajeDescripcion = MensajeExito.MensajeDeleteFactura;
                     }
